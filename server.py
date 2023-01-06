@@ -32,13 +32,15 @@ def client_communication(person):
     person.set_name(name)
     msg = bytes(f"{name} has been connected to the chat!","utf8")
     broadcast(msg,"")#welcome message
+    
+    # Receive a BUFSIZE packet and send a message to all persons.
     while True:
         try:
             msg = client.recv(BUFSIZE)
-            if msg == bytes("{quit}","utf8"):
+            if msg == bytes("{quit}","utf8"): #Disconnect.
                 client.close()
                 persons.remove(person)
-                broadcast(f"{name} has been disconnected","")
+                broadcast(bytes(f"{name} has been disconnected","utf8"),"")
                 print(f"[DISCONNECT] {name} disconnected")
                 break
             else:
@@ -59,7 +61,8 @@ def waiting_for_connection():
             client , clientAddress  = SERVER.accept()
             person = Person(clientAddress,client)
             persons.append(person)
-            print(f"[CONNECTION] {ADDR} connected to the server at {time.time()}")
+            current_time = time.strftime("%H:%M:%S")
+            print(f"[CONNECTION] {ADDR} connected to the server at {current_time}")
             Thread(target=client_communication , args=(person,)).start()
         except Exception as e:
             print ("[FAILED] Connection failes" , e)

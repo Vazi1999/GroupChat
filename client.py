@@ -37,13 +37,16 @@ class Client:
     def send_messages(self,msg):
         self.client_socket.send(bytes(msg,"utf-8"))
         if msg == "{quit}":
-            self.client.close()
+            self.client_socket.close()
 
     # Returns a list of messages.
     def get_messages(self):
+        messages_copy = self.messages[:]
         self.lock.acquire()
+        self.messages = []
         self.lock.release()
-        return self.messages
+        return messages_copy
+
 
     def disconnect(self):
-        self.send_messages(bytes("{quit}"),"utf-8")
+        self.send_messages("{quit}")
